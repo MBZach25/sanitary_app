@@ -1,50 +1,87 @@
-# Welcome to your Expo app 👋
+# FAU Sanitary App 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Get started
+## Intro
 
-1. Install dependencies
+Sanitary App is a React Native mobile application integrated with Firebase for authentication and cloud storage. The app allows students to report unclean areas on campus by submitting photos, pinning exact locations on a map, and adding descriptions. University staff can manage and respond to these reports, while IT administrators oversee system maintenance and security.
 
-   ```bash
-   npm install
-   ```
+The app ensures efficient reporting, real-time notifications, and streamlined campus cleanliness management.
 
-2. Start the app
+## Features
 
-   ```bash
-   npx expo start
-   ```
+## For Students
 
-In the output, you'll find options to open the app in a
+* Secure account creation and login.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+* Submit cleaning requests with photos of dirty areas.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+* Pin locations on a map with building names and numbers.
 
-## Get a fresh project
+* Add short descriptions or notes.
 
-When you're ready, run:
+* Track the status of submitted reports (Pending, In Progress, Cleaned).
 
-```bash
-npm run reset-project
-```
+* Receive notifications when staff respond or resolve a request.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## For University Staff
 
-## Learn more
+* Secure login and account management.
 
-To learn more about developing your project with Expo, look at the following resources:
+* Receive real-time notifications of cleaning requests.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+* View location, photo, and description of reported areas.
 
-## Join the community
+* Update task status to Cleaned.
 
-Join our community of developers creating universal apps.
+* Automatic filtering of requests outside working hours.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## For IT/System Maintenance Staff
+
+* Secure administrator login.
+
+* Manage all user accounts (create, edit, delete).
+
+* Monitor database integrity and server health.
+
+* View and analyze activity logs.
+
+* Perform system updates, backups, and recovery.
+
+* Ensure compliance with security protocols.
+
+## System Requirements
+
+* Authentication: Firebase Auth for secure login.
+
+* Cloud Storage: Store images in Firebase Cloud Storage.
+
+* Mapping: Google Maps API integration for location tracking.
+
+* Real-Time Notifications: Notify staff of new cleaning requests.
+
+* Role-Based Access Control: Different functionalities for students, staff, and IT administrators.
+
+* Cross-Platform: Deployable on Android, iOS, and Web.
+
+* Backup & Recovery: Daily backups with 24-hour recovery window.
+
+## Technologies Used
+
+* React Native
+
+* Firebase (Auth, Firestore, Cloud Storage)
+
+* Google Maps API
+
+* JavaScript / TypeScript
+
+* Node.js / npm
+
+## Usage
+
+* Students: Log in → Submit cleaning request → Track status → Receive notifications.
+
+* Staff: Log in → View requests → Update task status → Receive notifications.
+
+* IT/Admin: Log in → Manage accounts → Monitor logs → Perform maintenance tasks.
