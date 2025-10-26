@@ -85,3 +85,33 @@ The app ensures efficient reporting, real-time notifications, and streamlined ca
 * Staff: Log in → View requests → Update task status → Receive notifications.
 
 * IT/Admin: Log in → Manage accounts → Monitor logs → Perform maintenance tasks.
+
+## ⚙️ Installation & Setup
+
+### 🧑‍💻 For Developers
+
+Follow these steps to run the project locally on your machine:
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/MBZach25/sanitary_app.git
+   cd sanitary_app
+
+2. **Install Dependencies**
+
+   npm install
+   #or
+   yarn install
+
+3. **Set up firebase**
+    * Go to Firebase Console
+    * Create a new Firebase project
+    * Enable Authentication (Email/Password), Firestore and Cloud Storage.
+    * Copy your Firebase config settings and add them to your project (e.g., in a firebaseConfig.js file)
+
+4. **Run the app**
+
+   npx react-native run-android
+   #or
+   npx react-native run-ios #Not added in yet
