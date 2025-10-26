@@ -107,10 +107,10 @@ Follow these steps to run the project locally on your machine:
 
 3. **Set up firebase**
 
-    * Go to Firebase Console
-    * Create a new Firebase project
-    * Enable Authentication (Email/Password), Firestore and Cloud Storage.
-    * Copy your Firebase config settings and add them to your project (e.g., in a firebaseConfig.js file)
+    * Open invitation email and click Accept Invite for firebase collaborator role
+    * Sign in with the same Google account
+    * Once accepted, you will have access to the Firebase project via the Firebase Console.
+    * Can now use the firebaseConfig.js inside the project folder to connect to the shared Firebase backend.  
 
 4. **Run the app**
 
