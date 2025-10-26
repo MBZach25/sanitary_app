@@ -107,9 +107,7 @@ Follow these steps to run the project locally on your machine:
 
 3. **Set up firebase**
 
-    * Open invitation email and click Accept Invite for firebase collaborator role
-    * Sign in with the same Google account
-    * Once accepted, you will have access to the Firebase project via the Firebase Console.
+    * Should have access to the firebase project if you were added by the owner. No invitation email required. Just log in with the google account that was granted access
     * Can now use the firebaseConfig.js inside the project folder to connect to the shared Firebase backend.  
 
 4. **Run the app**
