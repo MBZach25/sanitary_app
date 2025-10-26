@@ -116,5 +116,6 @@ Follow these steps to run the project locally on your machine:
 
    ```bash
    npx react-native run-android
+   #If npx react-native run-android does not work, try npx expo run android
    #or
    npx react-native run-ios #Not added in yet
