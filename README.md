@@ -119,3 +119,7 @@ Follow these steps to run the project locally on your machine:
    #If npx react-native run-android does not work, try npx expo run android
    #or
    npx react-native run-ios #Not added in yet
+
+   # If not possible to use android emulator or personal phone, run it inside the web browser.
+   npx expo start
+   press w once the program finishes loading up.
