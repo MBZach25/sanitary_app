@@ -95,7 +95,7 @@ Follow these steps to run the project locally on your machine:
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/MBZach25/sanitary_app.git
+   git clone git@github.com:MBZach25/sanitary_app.git
    cd sanitary_app
 
 2. **Install Dependencies**
