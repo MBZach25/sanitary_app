@@ -100,11 +100,13 @@ Follow these steps to run the project locally on your machine:
 
 2. **Install Dependencies**
 
+   ```bash
    npm install
    #or
    yarn install
 
 3. **Set up firebase**
+
     * Go to Firebase Console
     * Create a new Firebase project
     * Enable Authentication (Email/Password), Firestore and Cloud Storage.
@@ -112,6 +114,7 @@ Follow these steps to run the project locally on your machine:
 
 4. **Run the app**
 
+   ```bash
    npx react-native run-android
    #or
    npx react-native run-ios #Not added in yet
