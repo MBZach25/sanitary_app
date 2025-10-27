@@ -90,34 +90,4 @@ The app ensures efficient reporting, real-time notifications, and streamlined ca
 
 ### 🧑‍💻 For Developers
 
-Follow these steps to run the project locally on your machine:
-
-1. **Clone the repository**
-
-   ```bash
-   git clone git@github.com:MBZach25/sanitary_app.git
-   cd sanitary_app
-
-2. **Install Dependencies**
-
-   ```bash
-   npm install
-   #or
-   yarn install
-
-3. **Set up firebase**
-
-    * Should have access to the firebase project if you were added by the owner. No invitation email required. Just log in with the google account that was granted access
-    * Can now use the firebaseConfig.js inside the project folder to connect to the shared Firebase backend.  
-
-4. **Run the app**
-
-   ```bash
-   npx react-native run-android
-   #If npx react-native run-android does not work, try npx expo run android
-   #or
-   npx react-native run-ios #Not added in yet
-
-   # If not possible to use android emulator or personal phone, run it inside the web browser.
-   npx expo start
-   press w once the program finishes loading up.
+GUIDE: [LINK DOC](https://docs.google.com/document/d/1eogMiXe7ubHG-SY72XXcA0uRPgAkyedBUYy2oHS68fI/edit?usp=sharing)
