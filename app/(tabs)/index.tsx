@@ -1,8 +1,8 @@
+import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { Animated, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { auth } from '../../firebaseConfig';
-
 export default function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +15,7 @@ export default function App() {
 
   // Add theme state to handle manual theme switching
   const [isDarkMode, setIsDarkMode] = useState(false);
-
+  const router = useRouter();
   // Listen for auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -118,7 +118,10 @@ export default function App() {
               
               <TouchableOpacity 
                 style={[styles.actionCard, isDarkMode && styles.darkActionCard]}
-                onPress={() => console.log('My Reports button pressed')}
+                onPress={() => {
+                  console.log('My Reports button pressed');
+                  router.push('/reports');
+                }}
               >
                 <Text style={[styles.actionIcon]}>📋</Text>
                 <Text style={[styles.actionText, isDarkMode && styles.darkText]}>My Reports</Text>
