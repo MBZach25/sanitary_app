@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, User } from 'firebase/auth';
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
+import React, { useEffect, useState } from 'react';
+import { Animated, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { auth } from '../../firebaseConfig';
 
 export default function App() {
@@ -8,18 +8,29 @@ export default function App() {
   const [password, setPassword] = useState('');
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
   
   const [emailFocus, setEmailFocus] = useState(new Animated.Value(0));
   const [passwordFocus, setPasswordFocus] = useState(new Animated.Value(0));
 
-  // Step 1: Add theme state to handle manual theme switching
+  // Add theme state to handle manual theme switching
   const [isDarkMode, setIsDarkMode] = useState(false);
 
+  // Listen for auth state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    return () => unsubscribe(); // Cleanup subscription on unmount
+  }, []);
+
   const handleSignUp = () => {
+    setError('');
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        setUser(user);
         setError('');
       })
       .catch((error) => {
@@ -27,17 +38,22 @@ export default function App() {
       });
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    setEmail('');
-    setPassword('');
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+      setEmail('');
+      setPassword('');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   const handleLogin = () => {
+    setError('');
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        setUser(user);
         setError('');
       })
       .catch((error) => {
@@ -61,20 +77,59 @@ export default function App() {
     }).start();
   };
 
-  // Step 2: Add a button to toggle the theme manually
   const toggleTheme = () => {
     setIsDarkMode(prevMode => !prevMode);
   };
 
+  // Show loading state while checking auth
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.container, isDarkMode && styles.darkContainer]}>
       {user ? (
-        <>
-          <Text style={[styles.welcomeText, isDarkMode && styles.darkText]}>Welcome, {user.email}!</Text>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutButtonText}>Logout</Text>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Text style={[styles.welcomeText, isDarkMode && styles.darkText]}>
+            Welcome, {user.email}!
+          </Text>
+          
+          {/* Add your home screen content here */}
+          <View style={[styles.homeContent, isDarkMode && styles.darkHomeContent]}>
+            <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>
+              🏫 Sanitary Report App
+            </Text>
+            <Text style={[styles.description, isDarkMode && styles.darkText]}>
+              Report unclean areas on campus and track their status.
+            </Text>
+            
+            <View style={styles.quickActions}>
+              <TouchableOpacity style={[styles.actionCard, isDarkMode && styles.darkActionCard]}>
+                <Text style={[styles.actionIcon]}>📷</Text>
+                <Text style={[styles.actionText, isDarkMode && styles.darkText]}>Report Issue</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity style={[styles.actionCard, isDarkMode && styles.darkActionCard]}>
+                <Text style={[styles.actionIcon]}>📋</Text>
+                <Text style={[styles.actionText, isDarkMode && styles.darkText]}>My Reports</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <TouchableOpacity style={[styles.button, isDarkMode && styles.darkButton]} onPress={handleLogout}>
+            <Text style={[styles.buttonText, isDarkMode && styles.darkButtonText]}>Logout</Text>
           </TouchableOpacity>
-        </>
+
+          <TouchableOpacity style={styles.themeToggleButton} onPress={toggleTheme}>
+            <Text style={styles.themeToggleText}>
+              {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
       ) : (
         <View style={[styles.formContainer, isDarkMode && styles.darkFormContainer]}>
           <Text style={[styles.title, isDarkMode && styles.darkText]}>Login</Text>
@@ -125,15 +180,14 @@ export default function App() {
             <Text style={[styles.buttonText, isDarkMode && styles.darkButtonText]}>Sign Up</Text>
           </TouchableOpacity>
           {error ? <Text style={[styles.error, isDarkMode && styles.darkError]}>{error}</Text> : null}
+          
+          <TouchableOpacity style={styles.themeToggleButton} onPress={toggleTheme}>
+            <Text style={styles.themeToggleText}>
+              {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            </Text>
+          </TouchableOpacity>
         </View>
       )}
-
-      {/* Step 3: Add a button to toggle dark mode */}
-      <TouchableOpacity style={styles.themeToggleButton} onPress={toggleTheme}>
-        <Text style={styles.themeToggleText}>
-          {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-        </Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -141,14 +195,22 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  centerContent: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
   },
   darkContainer: {
     backgroundColor: '#121212',
   },
+  scrollContent: {
+    flexGrow: 1,
+    padding: 20,
+  },
   formContainer: {
+    flex: 1,
+    justifyContent: 'center',
     width: '80%',
     padding: 20,
     backgroundColor: '#fff',
@@ -197,7 +259,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginVertical: 10,
-    elevation: 3, // Add shadow effect for the button
+    elevation: 3,
   },
   darkButton: {
     backgroundColor: '#6200ea',
@@ -236,6 +298,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 20,
+    textAlign: 'center',
   },
   themeToggleButton: {
     marginTop: 20,
@@ -246,5 +309,57 @@ const styles = StyleSheet.create({
   themeToggleText: {
     color: '#fff',
     fontSize: 16,
+  },
+  homeContent: {
+    marginVertical: 30,
+    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  darkHomeContent: {
+    backgroundColor: '#1c1c1c',
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 10,
+  },
+  description: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 20,
+  },
+  quickActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
+  },
+  actionCard: {
+    backgroundColor: '#f8f9fa',
+    padding: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+    width: '45%',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  darkActionCard: {
+    backgroundColor: '#2c2c2c',
+    borderColor: '#404040',
+  },
+  actionIcon: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  actionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
   },
 });
