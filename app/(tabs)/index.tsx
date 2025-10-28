@@ -108,12 +108,18 @@ export default function App() {
             </Text>
             
             <View style={styles.quickActions}>
-              <TouchableOpacity style={[styles.actionCard, isDarkMode && styles.darkActionCard]}>
+              <TouchableOpacity 
+                style={[styles.actionCard, isDarkMode && styles.darkActionCard]}
+                onPress={() => console.log('Report Issue button pressed')}
+              >
                 <Text style={[styles.actionIcon]}>📷</Text>
                 <Text style={[styles.actionText, isDarkMode && styles.darkText]}>Report Issue</Text>
               </TouchableOpacity>
               
-              <TouchableOpacity style={[styles.actionCard, isDarkMode && styles.darkActionCard]}>
+              <TouchableOpacity 
+                style={[styles.actionCard, isDarkMode && styles.darkActionCard]}
+                onPress={() => console.log('My Reports button pressed')}
+              >
                 <Text style={[styles.actionIcon]}>📋</Text>
                 <Text style={[styles.actionText, isDarkMode && styles.darkText]}>My Reports</Text>
               </TouchableOpacity>
