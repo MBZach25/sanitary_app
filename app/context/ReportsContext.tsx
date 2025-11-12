@@ -4,11 +4,10 @@ import {
   doc,
   onSnapshot,
   query,
-  updateDoc,
-  where
+  updateDoc
 } from 'firebase/firestore';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth, db } from '../../firebaseConfig';
+import { db } from '../firebaseConfig';
 
 export type Report = {
   id: string;
@@ -29,31 +28,25 @@ const ReportsContext = createContext<ReportsContextType | undefined>(undefined);
 export function ReportsProvider({ children }: { children: React.ReactNode }) {
   const [reports, setReports] = useState<Report[]>([]);
 
+  // ✅ Load all reports from Firestore (no user filter)
   useEffect(() => {
-    if (!auth.currentUser) return;
-
-    const q = query(
-      collection(db, 'reports'),
-      where('userId', '==', auth.currentUser.uid)
-    );
+    const q = query(collection(db, 'reports'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setReports(
         snapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         })) as Report[]
       );
     });
 
     return () => unsubscribe();
-  }, [auth.currentUser]);
+  }, []);
 
+  // ✅ Add report (no userId)
   const addReport = async (report: Omit<Report, 'id'>) => {
-    await addDoc(collection(db, 'reports'), {
-      ...report,
-      userId: auth.currentUser?.uid,
-    });
+    await addDoc(collection(db, 'reports'), report);
   };
 
   const updateReport = async (id: string, updates: Partial<Report>) => {

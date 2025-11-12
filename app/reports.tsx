@@ -33,13 +33,13 @@ export default function ReportsScreen() {
         {reports.map((report) => (
           <TouchableOpacity key={report.id} style={styles.card}>
             <View style={styles.cardHeader}>
-              <Text style={styles.cardLocation}>📍 {report.location}</Text>
+              <Text style={styles.cardLocation}> {report.location}</Text>
               <View style={[styles.statusBadge, { backgroundColor: getStatusColor(report.status) }]}>
                 <Text style={styles.statusText}>{report.status}</Text>
               </View>
             </View>
             <Text style={styles.cardDescription}>{report.description}</Text>
-            <Text style={styles.cardDate}>📅 {report.date}</Text>
+            <Text style={styles.cardDate}> {report.date}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>

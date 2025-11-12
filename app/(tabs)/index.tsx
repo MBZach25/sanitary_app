@@ -102,7 +102,7 @@ export default function App() {
           {/* Add your home screen content here */}
           <View style={[styles.homeContent, isDarkMode && styles.darkHomeContent]}>
             <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>
-              🏫 Sanitary Report App
+               Sanitary Report App
             </Text>
             <Text style={[styles.description, isDarkMode && styles.darkText]}>
               Report unclean areas on campus and track their status.
@@ -114,7 +114,7 @@ export default function App() {
                  onPress={() => router.push('../reportingTab')}
               >
                 <Text style={[styles.actionIcon]}>📷</Text>
-                <Text style={[styles.actionText, isDarkMode && styles.darkText]}>Report Issue</Text>
+                <Text style={[styles.actionText, isDarkMode && styles.darkText]}>Report An Issue...</Text>
               </TouchableOpacity>
               
               <TouchableOpacity 
