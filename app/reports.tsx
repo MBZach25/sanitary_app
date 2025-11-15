@@ -1,34 +1,11 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useReports } from './context/ReportsContext';
 
 export default function ReportsScreen() {
   const router = useRouter();
-
-  // Sample report data (replace with real data from Firebase later)
-  const reports = [
-    {
-      id: '1',
-      location: 'Building 12 - Restroom',
-      description: 'Trash on floor, needs cleaning',
-      status: 'Pending',
-      date: '2024-10-27',
-    },
-    {
-      id: '2',
-      location: 'Student Center - Hallway',
-      description: 'Spills on carpet',
-      status: 'In Progress',
-      date: '2024-10-26',
-    },
-    {
-      id: '3',
-      location: 'Library - Study Area',
-      description: 'Clean as expected',
-      status: 'Cleaned',
-      date: '2024-10-25',
-    },
-  ];
+  const { reports } = useReports();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -56,13 +33,13 @@ export default function ReportsScreen() {
         {reports.map((report) => (
           <TouchableOpacity key={report.id} style={styles.card}>
             <View style={styles.cardHeader}>
-              <Text style={styles.cardLocation}>📍 {report.location}</Text>
+              <Text style={styles.cardLocation}> {report.location}</Text>
               <View style={[styles.statusBadge, { backgroundColor: getStatusColor(report.status) }]}>
                 <Text style={styles.statusText}>{report.status}</Text>
               </View>
             </View>
             <Text style={styles.cardDescription}>{report.description}</Text>
-            <Text style={styles.cardDate}>📅 {report.date}</Text>
+            <Text style={styles.cardDate}> {report.date}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>

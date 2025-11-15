@@ -1,4 +1,4 @@
-# FAU Sanitary App 👋
+# FAU Sanitary App 
 
 Almost done
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
@@ -87,8 +87,8 @@ The app ensures efficient reporting, real-time notifications, and streamlined ca
 
 * IT/Admin: Log in → Manage accounts → Monitor logs → Perform maintenance tasks.
 
-## ⚙️ Installation & Setup
+##  Installation & Setup
 
-### 🧑‍💻 For Developers
+### For Developers
 
 GUIDE: [LINK DOC](https://docs.google.com/document/d/1eogMiXe7ubHG-SY72XXcA0uRPgAkyedBUYy2oHS68fI/edit?usp=sharing)
