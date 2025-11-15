@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
+import { createUserWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { Animated, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { auth } from '../../firebaseConfig';
@@ -9,7 +9,7 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-  
+  const [success, setSuccess] = useState('');
   const [emailFocus, setEmailFocus] = useState(new Animated.Value(0));
   const [passwordFocus, setPasswordFocus] = useState(new Animated.Value(0));
 
@@ -60,7 +60,22 @@ export default function App() {
         setError(error.message);
       });
   };
-
+  const handlePasswordReset = () => {
+    if (!email) {
+      setError('Please enter your email address');
+      return;
+    }
+    
+    setError('');
+    setSuccess('');
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        setSuccess('Password reset email sent! Check your inbox.');
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  };
   const handleFocus = (inputType: 'email' | 'password') => {
     Animated.timing(inputType === 'email' ? emailFocus : passwordFocus, {
       toValue: 1,
@@ -182,6 +197,16 @@ export default function App() {
               placeholderTextColor={isDarkMode ? '#bbb' : '#aaa'}
             />
           </Animated.View>
+          
+          
+          <TouchableOpacity 
+            onPress={handlePasswordReset}
+            style={styles.forgotPasswordContainer}
+          >
+            <Text style={[styles.forgotPasswordText, isDarkMode && styles.darkForgotPasswordText]}>
+              Forgot Password?
+            </Text>
+          </TouchableOpacity>
           <TouchableOpacity style={[styles.button, isDarkMode && styles.darkButton]} onPress={handleLogin}>
             <Text style={[styles.buttonText, isDarkMode && styles.darkButtonText]}>Login</Text>
           </TouchableOpacity>
@@ -189,7 +214,7 @@ export default function App() {
             <Text style={[styles.buttonText, isDarkMode && styles.darkButtonText]}>Sign Up</Text>
           </TouchableOpacity>
           {error ? <Text style={[styles.error, isDarkMode && styles.darkError]}>{error}</Text> : null}
-          
+          {success ? <Text style={[styles.success, isDarkMode && styles.darkSuccess]}>{success}</Text> : null}
           <TouchableOpacity style={styles.themeToggleButton} onPress={toggleTheme}>
             <Text style={styles.themeToggleText}>
               {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
@@ -289,6 +314,28 @@ const styles = StyleSheet.create({
   },
   darkError: {
     color: '#ff6f61',
+  },
+  forgotPasswordContainer: {
+    alignItems: 'flex-end',
+    marginBottom: 10,
+    marginTop: 5,
+  },
+  forgotPasswordText: {
+    color: '#007bff',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  darkForgotPasswordText: {
+    color: '#64b5f6',
+  },
+  success: {
+    color: '#4caf50',
+    fontSize: 14,
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  darkSuccess: {
+    color: '#81c784',
   },
   logoutButton: {
     padding: 15,
