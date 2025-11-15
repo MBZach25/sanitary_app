@@ -2,8 +2,8 @@ import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { Animated, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { createUserProfile, getUserProfile, UserRole } from '../../services/userService';
 import { auth } from '../firebaseConfig';
-
 export default function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,26 +17,33 @@ export default function App() {
   // Add theme state to handle manual theme switching
   const [isDarkMode, setIsDarkMode] = useState(false);
   const router = useRouter();
+  const [selectedRole, setSelectedRole] = useState<UserRole>('person');
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   // Listen for auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      if (user) {
+        const profile = await getUserProfile(user.uid);
+        setUserRole(profile?.role || 'person');
+      } else {
+        setUserRole(null);
+      }
       setLoading(false);
     });
-
-    return () => unsubscribe(); // Cleanup subscription on unmount
+  
+    return () => unsubscribe();
   }, []);
-
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     setError('');
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        setError('');
-      })
-      .catch((error) => {
-        setError(error.message);
-      });
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // Create user profile with selected role
+      await createUserProfile(userCredential.user.uid, userCredential.user.email!, selectedRole);
+      setError('');
+    } catch (error: any) {
+      setError(error.message);
+    }
   };
 
   const handleLogout = async () => {
@@ -114,35 +121,53 @@ export default function App() {
             Welcome, {user.email}!
           </Text>
           
-          {/* Add your home screen content here */}
-          <View style={[styles.homeContent, isDarkMode && styles.darkHomeContent]}>
-            <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>
-               Sanitary Report App
-            </Text>
-            <Text style={[styles.description, isDarkMode && styles.darkText]}>
-              Report unclean areas on campus and track their status.
-            </Text>
-            
-            <View style={styles.quickActions}>
-              <TouchableOpacity 
-                style={[styles.actionCard, isDarkMode && styles.darkActionCard]}
-                 onPress={() => router.push('../reportingTab')}
-              >
-                <Text style={[styles.actionIcon]}>📷</Text>
-                <Text style={[styles.actionText, isDarkMode && styles.darkText]}>Report An Issue...</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.actionCard, isDarkMode && styles.darkActionCard]}
-                onPress={() => {
-                  console.log('My Reports button pressed');
-                  router.push('../reports');
-                }}
-              >
-                <Text style={[styles.actionIcon]}>📋</Text>
-                <Text style={[styles.actionText, isDarkMode && styles.darkText]}>My Reports</Text>
-              </TouchableOpacity>
-            </View>
+                    {/* Role-based home screen content */}
+                    <View style={[styles.homeContent, isDarkMode && styles.darkHomeContent]}>
+            {userRole === 'cleaner' ? (
+              <>
+                <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>
+                  🧹 Cleaner Dashboard
+                </Text>
+                <Text style={[styles.description, isDarkMode && styles.darkText]}>
+                  View and manage all sanitary reports.
+                </Text>
+                
+                <TouchableOpacity
+                  style={[styles.actionCard, isDarkMode && styles.darkActionCard]}
+                  onPress={() => router.push('../cleaner-dashboard')}
+                >
+                  <Text style={[styles.actionIcon]}>📊</Text>
+                  <Text style={[styles.actionText, isDarkMode && styles.darkText]}>View All Reports</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>
+                  🏫 Sanitary Report App
+                </Text>
+                <Text style={[styles.description, isDarkMode && styles.darkText]}>
+                  Report unclean areas on campus and track their status.
+                </Text>
+                
+                <View style={styles.quickActions}>
+                  <TouchableOpacity 
+                    style={[styles.actionCard, isDarkMode && styles.darkActionCard]}
+                    onPress={() => router.push('../reportingTab')}
+                  >
+                    <Text style={[styles.actionIcon]}>📷</Text>
+                    <Text style={[styles.actionText, isDarkMode && styles.darkText]}>Report An Issue...</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={[styles.actionCard, isDarkMode && styles.darkActionCard]}
+                    onPress={() => router.push('../reports')}
+                  >
+                    <Text style={[styles.actionIcon]}>📋</Text>
+                    <Text style={[styles.actionText, isDarkMode && styles.darkText]}>My Reports</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
           </View>
 
           <TouchableOpacity style={[styles.button, isDarkMode && styles.darkButton]} onPress={handleLogout}>
@@ -208,6 +233,55 @@ export default function App() {
               Forgot Password?
             </Text>
           </TouchableOpacity>
+        
+          
+        
+        
+          
+          {/* 👇 INSERT ROLE SELECTOR HERE (between line 217 and 218) */}
+          <View style={styles.roleSelection}>
+            <Text style={[styles.roleLabel, isDarkMode && styles.darkText]}>I am signing up as:</Text>
+            <View style={styles.roleButtons}>
+              <TouchableOpacity
+                style={[
+                  styles.roleButton,
+                  selectedRole === 'person' && styles.roleButtonActive,
+                  isDarkMode && styles.darkRoleButton,
+                  selectedRole === 'person' && isDarkMode && styles.darkRoleButtonActive,
+                ]}
+                onPress={() => setSelectedRole('person')}
+              >
+                <Text style={[
+                  styles.roleButtonText,
+                  selectedRole === 'person' && styles.roleButtonTextActive,
+                  isDarkMode && styles.darkRoleButtonText,
+                ]}>
+                  👤 Student
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[
+                  styles.roleButton,
+                  selectedRole === 'cleaner' && styles.roleButtonActive,
+                  isDarkMode && styles.darkRoleButton,
+                  selectedRole === 'cleaner' && isDarkMode && styles.darkRoleButtonActive,
+                ]}
+                onPress={() => setSelectedRole('cleaner')}
+              >
+                <Text style={[
+                  styles.roleButtonText,
+                  selectedRole === 'cleaner' && styles.roleButtonTextActive,
+                  isDarkMode && styles.darkRoleButtonText,
+                ]}>
+                  🧹Staff
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          {/* 👆 END OF ROLE SELECTOR */}
+          
+        
           <TouchableOpacity style={[styles.button, isDarkMode && styles.darkButton]} onPress={handleLogin}>
             <Text style={[styles.buttonText, isDarkMode && styles.darkButtonText]}>Login</Text>
           </TouchableOpacity>
@@ -418,5 +492,53 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#333',
+  },
+  roleSelection: {
+    marginVertical: 15,
+    width: '100%',
+  },
+  roleLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  roleButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  roleButton: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  roleButtonActive: {
+    borderColor: '#007bff',
+    backgroundColor: '#e3f2fd',
+  },
+  darkRoleButton: {
+    backgroundColor: '#2c2c2c',
+    borderColor: '#555',
+  },
+  darkRoleButtonActive: {
+    borderColor: '#64b5f6',
+    backgroundColor: '#1a237e',
+  },
+  roleButtonText: {
+    fontSize: 13,
+    color: '#666',
+    fontWeight: '600',
+  },
+  roleButtonTextActive: {
+    color: '#007bff',
+    fontWeight: '700',
+  },
+  darkRoleButtonText: {
+    color: '#ccc',
   },
 });
