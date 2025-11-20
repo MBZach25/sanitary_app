@@ -4,10 +4,11 @@ import {
   doc,
   onSnapshot,
   query,
-  updateDoc
-} from 'firebase/firestore';
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { db } from '../firebaseConfig';
+  updateDoc,
+} from "firebase/firestore";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { db } from "../../firebase/firebaseConfig";
+
 
 export type Report = {
   id: string;
@@ -19,7 +20,7 @@ export type Report = {
 
 type ReportsContextType = {
   reports: Report[];
-  addReport: (report: Omit<Report, 'id'>) => void;
+  addReport: (report: Omit<Report, "id">) => void;
   updateReport: (id: string, updates: Partial<Report>) => void;
 };
 
@@ -30,7 +31,7 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
 
   // ✅ Load all reports from Firestore (no user filter)
   useEffect(() => {
-    const q = query(collection(db, 'reports'));
+    const q = query(collection(db, "reports"));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setReports(
@@ -45,12 +46,12 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ✅ Add report (no userId)
-  const addReport = async (report: Omit<Report, 'id'>) => {
-    await addDoc(collection(db, 'reports'), report);
+  const addReport = async (report: Omit<Report, "id">) => {
+    await addDoc(collection(db, "reports"), report);
   };
 
   const updateReport = async (id: string, updates: Partial<Report>) => {
-    const ref = doc(db, 'reports', id);
+    const ref = doc(db, "reports", id);
     await updateDoc(ref, updates);
   };
 
@@ -64,7 +65,7 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
 export function useReports() {
   const context = useContext(ReportsContext);
   if (!context) {
-    throw new Error('useReports must be used inside ReportsProvider');
+    throw new Error("useReports must be used inside ReportsProvider");
   }
   return context;
 }

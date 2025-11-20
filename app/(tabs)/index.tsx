@@ -1,23 +1,43 @@
-import { useRouter } from 'expo-router';
-import { createUserWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
-import React, { useEffect, useState } from 'react';
-import { Animated, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { createUserProfile, getUserProfile, UserRole } from '../../services/userService';
-import { auth } from '../firebaseConfig';
+import { useRouter } from "expo-router";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
+  User,
+} from "firebase/auth";
+import React, { useEffect, useState } from "react";
+import {
+  Animated,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { auth } from "../../firebase/firebaseConfig";
+
+import {
+  createUserProfile,
+  getUserProfile,
+  UserRole,
+} from "../../services/userService";
 export default function App() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [success, setSuccess] = useState('');
+  const [success, setSuccess] = useState("");
   const [emailFocus, setEmailFocus] = useState(new Animated.Value(0));
   const [passwordFocus, setPasswordFocus] = useState(new Animated.Value(0));
 
   // Add theme state to handle manual theme switching
   const [isDarkMode, setIsDarkMode] = useState(false);
   const router = useRouter();
-  const [selectedRole, setSelectedRole] = useState<UserRole>('person');
+  const [selectedRole, setSelectedRole] = useState<UserRole>("person");
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   // Listen for auth state changes
   useEffect(() => {
@@ -25,22 +45,30 @@ export default function App() {
       setUser(user);
       if (user) {
         const profile = await getUserProfile(user.uid);
-        setUserRole(profile?.role || 'person');
+        setUserRole(profile?.role || "person");
       } else {
         setUserRole(null);
       }
       setLoading(false);
     });
-  
+
     return () => unsubscribe();
   }, []);
   const handleSignUp = async () => {
-    setError('');
+    setError("");
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       // Create user profile with selected role
-      await createUserProfile(userCredential.user.uid, userCredential.user.email!, selectedRole);
-      setError('');
+      await createUserProfile(
+        userCredential.user.uid,
+        userCredential.user.email!,
+        selectedRole
+      );
+      setError("");
     } catch (error: any) {
       setError(error.message);
     }
@@ -50,19 +78,19 @@ export default function App() {
     try {
       await signOut(auth);
       setUser(null);
-      setEmail('');
-      setPassword('');
+      setEmail("");
+      setPassword("");
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
     }
   };
 
   const handleLogin = () => {
-    setError('');
+    setError("");
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        setError('');
+        setError("");
       })
       .catch((error) => {
         setError(error.message);
@@ -70,30 +98,30 @@ export default function App() {
   };
   const handlePasswordReset = () => {
     if (!email) {
-      setError('Please enter your email address');
+      setError("Please enter your email address");
       return;
     }
-    
-    setError('');
-    setSuccess('');
+
+    setError("");
+    setSuccess("");
     sendPasswordResetEmail(auth, email)
       .then(() => {
-        setSuccess('Password reset email sent! Check your inbox.');
+        setSuccess("Password reset email sent! Check your inbox.");
       })
       .catch((error) => {
         setError(error.message);
       });
   };
-  const handleFocus = (inputType: 'email' | 'password') => {
-    Animated.timing(inputType === 'email' ? emailFocus : passwordFocus, {
+  const handleFocus = (inputType: "email" | "password") => {
+    Animated.timing(inputType === "email" ? emailFocus : passwordFocus, {
       toValue: 1,
       duration: 200,
       useNativeDriver: true,
     }).start();
   };
 
-  const handleBlur = (inputType: 'email' | 'password') => {
-    Animated.timing(inputType === 'email' ? emailFocus : passwordFocus, {
+  const handleBlur = (inputType: "email" | "password") => {
+    Animated.timing(inputType === "email" ? emailFocus : passwordFocus, {
       toValue: 0,
       duration: 200,
       useNativeDriver: true,
@@ -101,7 +129,7 @@ export default function App() {
   };
 
   const toggleTheme = () => {
-    setIsDarkMode(prevMode => !prevMode);
+    setIsDarkMode((prevMode) => !prevMode);
   };
 
   // Show loading state while checking auth
@@ -120,74 +148,124 @@ export default function App() {
           <Text style={[styles.welcomeText, isDarkMode && styles.darkText]}>
             Welcome, {user.email}!
           </Text>
-          
-                    {/* Role-based home screen content */}
-                    <View style={[styles.homeContent, isDarkMode && styles.darkHomeContent]}>
-            {userRole === 'cleaner' ? (
+
+          {/* Role-based home screen content */}
+          <View
+            style={[styles.homeContent, isDarkMode && styles.darkHomeContent]}
+          >
+            {userRole === "cleaner" ? (
               <>
-                <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>
+                <Text
+                  style={[styles.sectionTitle, isDarkMode && styles.darkText]}
+                >
                   🧹 Cleaner Dashboard
                 </Text>
-                <Text style={[styles.description, isDarkMode && styles.darkText]}>
+                <Text
+                  style={[styles.description, isDarkMode && styles.darkText]}
+                >
                   View and manage all sanitary reports.
                 </Text>
-                
+
                 <TouchableOpacity
-                  style={[styles.actionCard, isDarkMode && styles.darkActionCard]}
-                  onPress={() => router.push('../cleaner-dashboard')}
+                  style={[
+                    styles.actionCard,
+                    isDarkMode && styles.darkActionCard,
+                  ]}
+                  onPress={() => router.push("../cleaner-dashboard")}
                 >
                   <Text style={[styles.actionIcon]}>📊</Text>
-                  <Text style={[styles.actionText, isDarkMode && styles.darkText]}>View All Reports</Text>
+                  <Text
+                    style={[styles.actionText, isDarkMode && styles.darkText]}
+                  >
+                    View All Reports
+                  </Text>
                 </TouchableOpacity>
               </>
             ) : (
               <>
-                <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>
+                <Text
+                  style={[styles.sectionTitle, isDarkMode && styles.darkText]}
+                >
                   🏫 Sanitary Report App
                 </Text>
-                <Text style={[styles.description, isDarkMode && styles.darkText]}>
+                <Text
+                  style={[styles.description, isDarkMode && styles.darkText]}
+                >
                   Report unclean areas on campus and track their status.
                 </Text>
-                
+
                 <View style={styles.quickActions}>
-                  <TouchableOpacity 
-                    style={[styles.actionCard, isDarkMode && styles.darkActionCard]}
-                    onPress={() => router.push('../reportingTab')}
+                  <TouchableOpacity
+                    style={[
+                      styles.actionCard,
+                      isDarkMode && styles.darkActionCard,
+                    ]}
+                    onPress={() => router.push("../reportingTab")}
                   >
                     <Text style={[styles.actionIcon]}>📷</Text>
-                    <Text style={[styles.actionText, isDarkMode && styles.darkText]}>Report An Issue...</Text>
+                    <Text
+                      style={[styles.actionText, isDarkMode && styles.darkText]}
+                    >
+                      Report An Issue...
+                    </Text>
                   </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={[styles.actionCard, isDarkMode && styles.darkActionCard]}
-                    onPress={() => router.push('../reports')}
+
+                  <TouchableOpacity
+                    style={[
+                      styles.actionCard,
+                      isDarkMode && styles.darkActionCard,
+                    ]}
+                    onPress={() => router.push("../reports")}
                   >
                     <Text style={[styles.actionIcon]}>📋</Text>
-                    <Text style={[styles.actionText, isDarkMode && styles.darkText]}>My Reports</Text>
+                    <Text
+                      style={[styles.actionText, isDarkMode && styles.darkText]}
+                    >
+                      My Reports
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </>
             )}
           </View>
 
-          <TouchableOpacity style={[styles.button, isDarkMode && styles.darkButton]} onPress={handleLogout}>
-            <Text style={[styles.buttonText, isDarkMode && styles.darkButtonText]}>Logout</Text>
+          <TouchableOpacity
+            style={[styles.button, isDarkMode && styles.darkButton]}
+            onPress={handleLogout}
+          >
+            <Text
+              style={[styles.buttonText, isDarkMode && styles.darkButtonText]}
+            >
+              Logout
+            </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.themeToggleButton} onPress={toggleTheme}>
+          <TouchableOpacity
+            style={styles.themeToggleButton}
+            onPress={toggleTheme}
+          >
             <Text style={styles.themeToggleText}>
-              {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              {isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             </Text>
           </TouchableOpacity>
         </ScrollView>
       ) : (
-        <View style={[styles.formContainer, isDarkMode && styles.darkFormContainer]}>
-          <Text style={[styles.title, isDarkMode && styles.darkText]}>Login</Text>
+        <View
+          style={[styles.formContainer, isDarkMode && styles.darkFormContainer]}
+        >
+          <Text style={[styles.title, isDarkMode && styles.darkText]}>
+            Login
+          </Text>
           <Animated.View
             style={[
               styles.inputWrapper,
-              { borderColor: emailFocus.interpolate({ inputRange: [0, 1], outputRange: ['#ddd', '#007bff'] }) },
-              isDarkMode && { borderColor: '#bbb' },
+              {
+                borderColor: emailFocus.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ["#ddd", "#007bff"],
+                }),
+              },
+              isDarkMode && { borderColor: "#bbb" },
             ]}
           >
             <TextInput
@@ -195,19 +273,24 @@ export default function App() {
               placeholder="Email"
               value={email}
               onChangeText={setEmail}
-              onFocus={() => handleFocus('email')}
-              onBlur={() => handleBlur('email')}
+              onFocus={() => handleFocus("email")}
+              onBlur={() => handleBlur("email")}
               keyboardType="email-address"
               autoCapitalize="none"
               autoComplete="email"
-              placeholderTextColor={isDarkMode ? '#bbb' : '#aaa'}
+              placeholderTextColor={isDarkMode ? "#bbb" : "#aaa"}
             />
           </Animated.View>
           <Animated.View
             style={[
               styles.inputWrapper,
-              { borderColor: passwordFocus.interpolate({ inputRange: [0, 1], outputRange: ['#ddd', '#007bff'] }) },
-              isDarkMode && { borderColor: '#bbb' },
+              {
+                borderColor: passwordFocus.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ["#ddd", "#007bff"],
+                }),
+              },
+              isDarkMode && { borderColor: "#bbb" },
             ]}
           >
             <TextInput
@@ -216,83 +299,117 @@ export default function App() {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              onFocus={() => handleFocus('password')}
-              onBlur={() => handleBlur('password')}
+              onFocus={() => handleFocus("password")}
+              onBlur={() => handleBlur("password")}
               autoCapitalize="none"
               autoComplete="password"
-              placeholderTextColor={isDarkMode ? '#bbb' : '#aaa'}
+              placeholderTextColor={isDarkMode ? "#bbb" : "#aaa"}
             />
           </Animated.View>
-          
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             onPress={handlePasswordReset}
             style={styles.forgotPasswordContainer}
           >
-            <Text style={[styles.forgotPasswordText, isDarkMode && styles.darkForgotPasswordText]}>
+            <Text
+              style={[
+                styles.forgotPasswordText,
+                isDarkMode && styles.darkForgotPasswordText,
+              ]}
+            >
               Forgot Password?
             </Text>
           </TouchableOpacity>
-        
-          
-        
-        
-          
+
           {/* 👇 INSERT ROLE SELECTOR HERE (between line 217 and 218) */}
           <View style={styles.roleSelection}>
-            <Text style={[styles.roleLabel, isDarkMode && styles.darkText]}>I am signing up as:</Text>
+            <Text style={[styles.roleLabel, isDarkMode && styles.darkText]}>
+              I am signing up as:
+            </Text>
             <View style={styles.roleButtons}>
               <TouchableOpacity
                 style={[
                   styles.roleButton,
-                  selectedRole === 'person' && styles.roleButtonActive,
+                  selectedRole === "person" && styles.roleButtonActive,
                   isDarkMode && styles.darkRoleButton,
-                  selectedRole === 'person' && isDarkMode && styles.darkRoleButtonActive,
+                  selectedRole === "person" &&
+                    isDarkMode &&
+                    styles.darkRoleButtonActive,
                 ]}
-                onPress={() => setSelectedRole('person')}
+                onPress={() => setSelectedRole("person")}
               >
-                <Text style={[
-                  styles.roleButtonText,
-                  selectedRole === 'person' && styles.roleButtonTextActive,
-                  isDarkMode && styles.darkRoleButtonText,
-                ]}>
+                <Text
+                  style={[
+                    styles.roleButtonText,
+                    selectedRole === "person" && styles.roleButtonTextActive,
+                    isDarkMode && styles.darkRoleButtonText,
+                  ]}
+                >
                   👤 Student
                 </Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 style={[
                   styles.roleButton,
-                  selectedRole === 'cleaner' && styles.roleButtonActive,
+                  selectedRole === "cleaner" && styles.roleButtonActive,
                   isDarkMode && styles.darkRoleButton,
-                  selectedRole === 'cleaner' && isDarkMode && styles.darkRoleButtonActive,
+                  selectedRole === "cleaner" &&
+                    isDarkMode &&
+                    styles.darkRoleButtonActive,
                 ]}
-                onPress={() => setSelectedRole('cleaner')}
+                onPress={() => setSelectedRole("cleaner")}
               >
-                <Text style={[
-                  styles.roleButtonText,
-                  selectedRole === 'cleaner' && styles.roleButtonTextActive,
-                  isDarkMode && styles.darkRoleButtonText,
-                ]}>
+                <Text
+                  style={[
+                    styles.roleButtonText,
+                    selectedRole === "cleaner" && styles.roleButtonTextActive,
+                    isDarkMode && styles.darkRoleButtonText,
+                  ]}
+                >
                   🧹Staff
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
           {/* 👆 END OF ROLE SELECTOR */}
-          
-        
-          <TouchableOpacity style={[styles.button, isDarkMode && styles.darkButton]} onPress={handleLogin}>
-            <Text style={[styles.buttonText, isDarkMode && styles.darkButtonText]}>Login</Text>
+
+          <TouchableOpacity
+            style={[styles.button, isDarkMode && styles.darkButton]}
+            onPress={handleLogin}
+          >
+            <Text
+              style={[styles.buttonText, isDarkMode && styles.darkButtonText]}
+            >
+              Login
+            </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, isDarkMode && styles.darkButton]} onPress={handleSignUp}>
-            <Text style={[styles.buttonText, isDarkMode && styles.darkButtonText]}>Sign Up</Text>
+          <TouchableOpacity
+            style={[styles.button, isDarkMode && styles.darkButton]}
+            onPress={handleSignUp}
+          >
+            <Text
+              style={[styles.buttonText, isDarkMode && styles.darkButtonText]}
+            >
+              Sign Up
+            </Text>
           </TouchableOpacity>
-          {error ? <Text style={[styles.error, isDarkMode && styles.darkError]}>{error}</Text> : null}
-          {success ? <Text style={[styles.success, isDarkMode && styles.darkSuccess]}>{success}</Text> : null}
-          <TouchableOpacity style={styles.themeToggleButton} onPress={toggleTheme}>
+          {error ? (
+            <Text style={[styles.error, isDarkMode && styles.darkError]}>
+              {error}
+            </Text>
+          ) : null}
+          {success ? (
+            <Text style={[styles.success, isDarkMode && styles.darkSuccess]}>
+              {success}
+            </Text>
+          ) : null}
+          <TouchableOpacity
+            style={styles.themeToggleButton}
+            onPress={toggleTheme}
+          >
             <Text style={styles.themeToggleText}>
-              {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              {isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -304,14 +421,14 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   centerContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   darkContainer: {
-    backgroundColor: '#121212',
+    backgroundColor: "#121212",
   },
   scrollContent: {
     flexGrow: 1,
@@ -319,170 +436,170 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flex: 1,
-    justifyContent: 'center',
-    width: '80%',
+    justifyContent: "center",
+    width: "80%",
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 5,
   },
   darkFormContainer: {
-    backgroundColor: '#1c1c1c',
+    backgroundColor: "#1c1c1c",
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
     marginBottom: 30,
   },
   darkText: {
-    color: '#fff',
+    color: "#fff",
   },
   inputWrapper: {
     marginVertical: 15,
     borderWidth: 1,
     borderRadius: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   input: {
     padding: 15,
     fontSize: 16,
-    color: '#333',
-    width: '100%',
+    color: "#333",
+    width: "100%",
     borderRadius: 10,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   darkInput: {
-    backgroundColor: '#333',
-    color: '#fff',
+    backgroundColor: "#333",
+    color: "#fff",
   },
   button: {
-    width: '100%',
+    width: "100%",
     padding: 15,
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 10,
     elevation: 3,
   },
   darkButton: {
-    backgroundColor: '#6200ea',
+    backgroundColor: "#6200ea",
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   darkButtonText: {
-    color: '#fff',
+    color: "#fff",
   },
   error: {
-    color: 'red',
+    color: "red",
     fontSize: 14,
     marginTop: 10,
-    textAlign: 'center',
+    textAlign: "center",
   },
   darkError: {
-    color: '#ff6f61',
+    color: "#ff6f61",
   },
   forgotPasswordContainer: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
     marginBottom: 10,
     marginTop: 5,
   },
   forgotPasswordText: {
-    color: '#007bff',
+    color: "#007bff",
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   darkForgotPasswordText: {
-    color: '#64b5f6',
+    color: "#64b5f6",
   },
   success: {
-    color: '#4caf50',
+    color: "#4caf50",
     fontSize: 14,
     marginTop: 10,
-    textAlign: 'center',
+    textAlign: "center",
   },
   darkSuccess: {
-    color: '#81c784',
+    color: "#81c784",
   },
   logoutButton: {
     padding: 15,
-    backgroundColor: '#ff4d4d',
+    backgroundColor: "#ff4d4d",
     borderRadius: 8,
     marginTop: 20,
   },
   logoutButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
   },
   welcomeText: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   themeToggleButton: {
     marginTop: 20,
     padding: 10,
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     borderRadius: 8,
   },
   themeToggleText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
   },
   homeContent: {
     marginVertical: 30,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
   },
   darkHomeContent: {
-    backgroundColor: '#1c1c1c',
+    backgroundColor: "#1c1c1c",
   },
   sectionTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 10,
   },
   description: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
     marginBottom: 20,
   },
   quickActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginTop: 20,
   },
   actionCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     padding: 20,
     borderRadius: 12,
-    alignItems: 'center',
-    width: '45%',
+    alignItems: "center",
+    width: "45%",
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: "#e0e0e0",
   },
   darkActionCard: {
-    backgroundColor: '#2c2c2c',
-    borderColor: '#404040',
+    backgroundColor: "#2c2c2c",
+    borderColor: "#404040",
   },
   actionIcon: {
     fontSize: 32,
@@ -490,22 +607,22 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   roleSelection: {
     marginVertical: 15,
-    width: '100%',
+    width: "100%",
   },
   roleLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 10,
-    textAlign: 'center',
+    textAlign: "center",
   },
   roleButtons: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
   },
   roleButton: {
@@ -513,32 +630,32 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#ddd',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    borderColor: "#ddd",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
   roleButtonActive: {
-    borderColor: '#007bff',
-    backgroundColor: '#e3f2fd',
+    borderColor: "#007bff",
+    backgroundColor: "#e3f2fd",
   },
   darkRoleButton: {
-    backgroundColor: '#2c2c2c',
-    borderColor: '#555',
+    backgroundColor: "#2c2c2c",
+    borderColor: "#555",
   },
   darkRoleButtonActive: {
-    borderColor: '#64b5f6',
-    backgroundColor: '#1a237e',
+    borderColor: "#64b5f6",
+    backgroundColor: "#1a237e",
   },
   roleButtonText: {
     fontSize: 13,
-    color: '#666',
-    fontWeight: '600',
+    color: "#666",
+    fontWeight: "600",
   },
   roleButtonTextActive: {
-    color: '#007bff',
-    fontWeight: '700',
+    color: "#007bff",
+    fontWeight: "700",
   },
   darkRoleButtonText: {
-    color: '#ccc',
+    color: "#ccc",
   },
 });
