@@ -6,6 +6,7 @@ import {
   onSnapshot,
   query,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { db } from "../../firebase/firebaseConfig";
@@ -14,6 +15,7 @@ const auth = getAuth();
 
 export type Report = {
   id: string;
+  studentId: string; // new field
   location: string;
   description: string;
   status: string;
@@ -22,7 +24,7 @@ export type Report = {
 
 type ReportsContextType = {
   reports: Report[];
-  addReport: (report: Omit<Report, "id">) => void;
+  addReport: (report: Omit<Report, "id" | "studentId">) => void;
   updateReport: (id: string, updates: Partial<Report>) => void;
 };
 
@@ -31,33 +33,38 @@ const ReportsContext = createContext<ReportsContextType | undefined>(undefined);
 export function ReportsProvider({ children }: { children: React.ReactNode }) {
   const [reports, setReports] = useState<Report[]>([]);
 
-  // ✅ Load all reports from Firestore (no user filter)
+  // Load only reports for the current student
   useEffect(() => {
-    const q = query(collection(db, "reports"));
+    if (!auth.currentUser) return;
+
+    const q = query(
+      collection(db, "reports"),
+      where("studentId", "==", auth.currentUser.uid)
+    );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setReports(
         snapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data(),
-        })) as Report[]
+          ...(doc.data() as Omit<Report, "id">),
+        }))
       );
     });
 
     return () => unsubscribe();
   }, []);
 
-  // ✅ Add report (no userId)
-  const addReport = async (report: Omit<Report, "id">) => {
-    await addDoc(collection(db, "reports"), report);
+  const addReport = async (report: Omit<Report, "id" | "studentId">) => {
+    if (!auth.currentUser) return;
+
+    await addDoc(collection(db, "reports"), {
+      ...report,
+      studentId: auth.currentUser.uid, // associate report with the user
+    });
   };
 
   const updateReport = async (id: string, updates: Partial<Report>) => {
     const ref = doc(db, "reports", id);
-    if (auth.currentUser) {
-      await auth.currentUser.getIdToken(true);
-    }
-
     await updateDoc(ref, updates);
   };
 

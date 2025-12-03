@@ -10,9 +10,13 @@ import {
 } from "react-native";
 import { useReports } from "./context/ReportsContext";
 
-export default function ReportsScreen() {
+type ReportsScreenProps = {
+  userRole: "person" | "cleaner";
+};
+
+export default function ReportsScreen({ userRole }: ReportsScreenProps) {
   const router = useRouter();
-  const { reports, updateReport } = useReports(); // ✅ grab updateReport
+  const { reports, updateReport } = useReports();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -69,26 +73,36 @@ export default function ReportsScreen() {
             <Text style={styles.cardDescription}>{report.description}</Text>
             <Text style={styles.cardDate}>{report.date}</Text>
 
-            {/* Status change buttons */}
-            <View style={styles.statusButtons}>
-              {report.status !== "In Progress" && (
-                <TouchableOpacity
-                  style={[styles.statusButton, { backgroundColor: "#2196f3" }]}
-                  onPress={() => handleStatusChange(report.id, "In Progress")}
-                >
-                  <Text style={styles.statusButtonText}>Mark In Progress</Text>
-                </TouchableOpacity>
-              )}
+            {/* Only show status change buttons for cleaners */}
+            {userRole === "cleaner" && (
+              <View style={styles.statusButtons}>
+                {report.status !== "In Progress" && (
+                  <TouchableOpacity
+                    style={[
+                      styles.statusButton,
+                      { backgroundColor: "#2196f3" },
+                    ]}
+                    onPress={() => handleStatusChange(report.id, "In Progress")}
+                  >
+                    <Text style={styles.statusButtonText}>
+                      Mark In Progress
+                    </Text>
+                  </TouchableOpacity>
+                )}
 
-              {report.status !== "Cleaned" && (
-                <TouchableOpacity
-                  style={[styles.statusButton, { backgroundColor: "#4caf50" }]}
-                  onPress={() => handleStatusChange(report.id, "Cleaned")}
-                >
-                  <Text style={styles.statusButtonText}>Mark Cleaned</Text>
-                </TouchableOpacity>
-              )}
-            </View>
+                {report.status !== "Cleaned" && (
+                  <TouchableOpacity
+                    style={[
+                      styles.statusButton,
+                      { backgroundColor: "#4caf50" },
+                    ]}
+                    onPress={() => handleStatusChange(report.id, "Cleaned")}
+                  >
+                    <Text style={styles.statusButtonText}>Mark Cleaned</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
           </View>
         ))}
       </ScrollView>

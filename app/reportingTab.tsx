@@ -17,22 +17,29 @@ export default function NewReportScreen() {
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!location || !description) {
       Alert.alert("Error", "Please fill out all fields");
       return;
     }
 
     const newReport = {
-      id: Date.now().toString(), // auto-generate ID
       location,
       description,
-      status: "Pending", // default status
-      date: new Date().toISOString().split("T")[0], // current date YYYY-MM-DD
+      status: "Pending",
+      date: new Date().toISOString().split("T")[0],
     };
 
-    addReport(newReport);
-    router.push("/reports"); // navigate back to reports list
+    try {
+      // Wait for Firestore to save the report
+      await addReport(newReport);
+
+      // Navigate back to the student dashboard (home screen)
+      router.replace("/"); // "/" corresponds to your index.tsx
+    } catch (error) {
+      console.error("Failed to add report:", error);
+      Alert.alert("Error", "Failed to add report. Please try again.");
+    }
   };
 
   return (
