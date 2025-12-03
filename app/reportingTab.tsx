@@ -1,18 +1,25 @@
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useReports } from './context/ReportsContext';
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useReports } from "./context/ReportsContext";
 
 export default function NewReportScreen() {
   const { addReport } = useReports();
   const router = useRouter();
 
-  const [location, setLocation] = useState('');
-  const [description, setDescription] = useState('');
+  const [location, setLocation] = useState("");
+  const [description, setDescription] = useState("");
 
   const handleSubmit = () => {
     if (!location || !description) {
-      Alert.alert('Error', 'Please fill out all fields');
+      Alert.alert("Error", "Please fill out all fields");
       return;
     }
 
@@ -20,12 +27,12 @@ export default function NewReportScreen() {
       id: Date.now().toString(), // auto-generate ID
       location,
       description,
-      status: 'Pending', // default status
-      date: new Date().toISOString().split('T')[0], // current date YYYY-MM-DD
+      status: "Pending", // default status
+      date: new Date().toISOString().split("T")[0], // current date YYYY-MM-DD
     };
 
     addReport(newReport);
-    router.push('/reports'); // navigate back to reports list
+    router.push("/reports"); // navigate back to reports list
   };
 
   return (
@@ -58,18 +65,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    justifyContent: "center",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 30,
-    textAlign: 'center',
+    textAlign: "center",
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     padding: 12,
     borderRadius: 8,
     marginBottom: 15,
@@ -77,18 +84,18 @@ const styles = StyleSheet.create({
   },
   textArea: {
     height: 120,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
   },
   button: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     padding: 15,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

@@ -84,18 +84,26 @@ export default function App() {
       console.error("Error signing out:", error);
     }
   };
-
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setError("");
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        setError("");
-      })
-      .catch((error) => {
-        setError(error.message);
-      });
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Refresh token to include custom claims
+      await user.getIdToken(true);
+
+      // Now you can safely read/write Firestore
+      setError("");
+    } catch (error: any) {
+      setError(error.message);
+    }
   };
+
   const handlePasswordReset = () => {
     if (!email) {
       setError("Please enter your email address");
@@ -178,6 +186,20 @@ export default function App() {
                     style={[styles.actionText, isDarkMode && styles.darkText]}
                   >
                     View All Reports
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.actionCard,
+                    isDarkMode && styles.darkActionCard,
+                  ]}
+                  onPress={() => router.push("../users")}
+                >
+                  <Text style={styles.actionIcon}>👥</Text>
+                  <Text
+                    style={[styles.actionText, isDarkMode && styles.darkText]}
+                  >
+                    View All Users
                   </Text>
                 </TouchableOpacity>
               </>

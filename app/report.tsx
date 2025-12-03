@@ -1,4 +1,16 @@
-import React, { createContext, useContext, useState } from 'react';
+import { getAuth } from "firebase/auth";
+import {
+  addDoc,
+  collection,
+  doc,
+  onSnapshot,
+  query,
+  updateDoc,
+} from "firebase/firestore";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { db } from "../firebase/firebaseConfig";
+
+const auth = getAuth();
 
 export type Report = {
   id: string;
@@ -17,26 +29,33 @@ type ReportsContextType = {
 const ReportsContext = createContext<ReportsContextType | undefined>(undefined);
 
 export function ReportsProvider({ children }: { children: React.ReactNode }) {
-  const [reports, setReports] = useState<Report[]>([
-    {
-      id: '1',
-      location: 'Building 12 - Restroom',
-      description: 'Trash on floor, needs cleaning',
-      status: 'Pending',
-      date: '2024-10-27',
-    },
-  ]);
+  const [reports, setReports] = useState<Report[]>([]);
 
-  const addReport = (report: Report) => {
-    setReports(prev => [...prev, report]);
+  useEffect(() => {
+    const q = query(collection(db, "reports"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const reportsData: Report[] = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Report[];
+      setReports(reportsData);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const addReport = async (report: Omit<Report, "id">) => {
+    await addDoc(collection(db, "reports"), report);
   };
 
-  const updateReport = (id: string, updatedFields: Partial<Report>) => {
-    setReports(prev =>
-      prev.map(report =>
-        report.id === id ? { ...report, ...updatedFields } : report
-      )
-    );
+  const updateReport = async (id: string, updatedFields: Partial<Report>) => {
+    if (!auth.currentUser) throw new Error("User not authenticated");
+
+    // Refresh token to ensure custom claims (userRole) are applied
+    await auth.currentUser.getIdToken(true);
+
+    const ref = doc(db, "reports", id);
+    await updateDoc(ref, updatedFields);
   };
 
   return (

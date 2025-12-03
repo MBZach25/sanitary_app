@@ -1,3 +1,4 @@
+import { getAuth } from "firebase/auth";
 import {
   addDoc,
   collection,
@@ -9,6 +10,7 @@ import {
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { db } from "../../firebase/firebaseConfig";
 
+const auth = getAuth();
 
 export type Report = {
   id: string;
@@ -52,6 +54,10 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
 
   const updateReport = async (id: string, updates: Partial<Report>) => {
     const ref = doc(db, "reports", id);
+    if (auth.currentUser) {
+      await auth.currentUser.getIdToken(true);
+    }
+
     await updateDoc(ref, updates);
   };
 

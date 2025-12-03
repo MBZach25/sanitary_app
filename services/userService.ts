@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 
 export type UserRole = "person" | "cleaner";
@@ -33,4 +33,9 @@ export const getUserProfile = async (
     return docSnap.data() as UserProfile;
   }
   return null;
+};
+
+export const getAllUsers = async (): Promise<UserProfile[]> => {
+  const snap = await getDocs(collection(db, "users"));
+  return snap.docs.map((doc) => doc.data() as UserProfile);
 };

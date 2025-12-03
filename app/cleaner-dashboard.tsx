@@ -4,6 +4,7 @@ import {
   doc,
   onSnapshot,
   query,
+  serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
@@ -35,7 +36,7 @@ export default function CleanerDashboard() {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const reportsData: Report[] = [];
       querySnapshot.forEach((doc) => {
-        reportsData.push({ id: doc.id, ...doc.data() } as Report);
+        reportsData.push({ ...doc.data(), id: doc.id } as Report);
       });
       setReports(reportsData);
     });
@@ -50,10 +51,16 @@ export default function CleanerDashboard() {
     try {
       await updateDoc(doc(db, "reports", reportId), {
         status: newStatus,
-        updatedAt: new Date(),
+        updatedAt: serverTimestamp(),
       });
+
+      if (newStatus === "Cleaned") {
+        setReports((prev) => prev.filter((r) => r.id !== reportId));
+      }
+
       Alert.alert("Success", `Report marked as ${newStatus}`);
     } catch (error) {
+      console.error("Update failed:", error);
       Alert.alert("Error", "Failed to update report");
     }
   };
