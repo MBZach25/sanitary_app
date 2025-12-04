@@ -31,11 +31,10 @@ export default function NewReportScreen() {
     };
 
     try {
-      // Wait for Firestore to save the report
+
       await addReport(newReport);
 
-      // Navigate back to the student dashboard (home screen)
-      router.replace("/"); // "/" corresponds to your index.tsx
+      router.replace("/"); 
     } catch (error) {
       console.error("Failed to add report:", error);
       Alert.alert("Error", "Failed to add report. Please try again.");

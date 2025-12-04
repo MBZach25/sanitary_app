@@ -34,12 +34,11 @@ export default function App() {
   const [emailFocus, setEmailFocus] = useState(new Animated.Value(0));
   const [passwordFocus, setPasswordFocus] = useState(new Animated.Value(0));
 
-  // Add theme state to handle manual theme switching
   const [isDarkMode, setIsDarkMode] = useState(false);
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<UserRole>("person");
   const [userRole, setUserRole] = useState<UserRole | null>(null);
-  // Listen for auth state changes
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
@@ -62,7 +61,7 @@ export default function App() {
         email,
         password
       );
-      // Create user profile with selected role
+
       await createUserProfile(
         userCredential.user.uid,
         userCredential.user.email!,
@@ -94,10 +93,8 @@ export default function App() {
       );
       const user = userCredential.user;
 
-      // Refresh token to include custom claims
       await user.getIdToken(true);
 
-      // Now you can safely read/write Firestore
       setError("");
     } catch (error: any) {
       setError(error.message);
@@ -140,7 +137,6 @@ export default function App() {
     setIsDarkMode((prevMode) => !prevMode);
   };
 
-  // Show loading state while checking auth
   if (loading) {
     return (
       <View style={[styles.container, styles.centerContent]}>

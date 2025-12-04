@@ -33,7 +33,6 @@ const ReportsContext = createContext<ReportsContextType | undefined>(undefined);
 export function ReportsProvider({ children }: { children: React.ReactNode }) {
   const [reports, setReports] = useState<Report[]>([]);
 
-  // Load only reports for the current student
   useEffect(() => {
     if (!auth.currentUser) return;
 
@@ -59,7 +58,7 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
 
     await addDoc(collection(db, "reports"), {
       ...report,
-      studentId: auth.currentUser.uid, // associate report with the user
+      studentId: auth.currentUser.uid, 
     });
   };
 

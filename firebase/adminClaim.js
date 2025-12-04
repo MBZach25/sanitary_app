@@ -5,7 +5,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const uid = "r1YErhrmg3fShBNDmNAumONm4A03"; // your cleaner/admin UID
+const uid = "r1YErhrmg3fShBNDmNAumONm4A03"; 
 
 admin.auth().setCustomUserClaims(uid, { userRole: "cleaner" })
   .then(() => console.log("Custom claim 'userRole: cleaner' added successfully"))

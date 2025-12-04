@@ -5,7 +5,6 @@ import { getAllUsers, UserProfile } from "../services/userService";
 export default function UsersScreen() {
   const [users, setUsers] = useState<UserProfile[]>([]);
 
-  // ⭐ THIS IS WHERE THE useEffect GOES
   useEffect(() => {
     async function load() {
       const list = await getAllUsers();

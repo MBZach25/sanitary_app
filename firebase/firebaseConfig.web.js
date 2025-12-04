@@ -1,4 +1,4 @@
-// firebase/firebaseConfig.web.js
+
 import { initializeApp } from "firebase/app";
 import { browserLocalPersistence, getAuth, setPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";

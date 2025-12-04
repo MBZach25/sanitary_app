@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import React from "react";
-import { ReportsProvider } from "./context/ReportsContext"; // adjust path if needed
+import { ReportsProvider } from "./context/ReportsContext"; 
 import { ThemeProvider } from "./context/ThemeContext";
 
 export default function RootLayout() {

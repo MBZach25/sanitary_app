@@ -51,7 +51,6 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
   const updateReport = async (id: string, updatedFields: Partial<Report>) => {
     if (!auth.currentUser) throw new Error("User not authenticated");
 
-    // Refresh token to ensure custom claims (userRole) are applied
     await auth.currentUser.getIdToken(true);
 
     const ref = doc(db, "reports", id);
